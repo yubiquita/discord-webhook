@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"discord-webhook/internal/config"
-	"discord-webhook/internal/webhook"
+	"github.com/yubiquita/discord-webhook/internal/config"
+	"github.com/yubiquita/discord-webhook/internal/webhook"
 	"github.com/spf13/cobra"
 )
 

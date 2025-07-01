@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"discord-webhook/internal/cli"
+	"github.com/yubiquita/discord-webhook/internal/cli"
 )
 
 func main() {
