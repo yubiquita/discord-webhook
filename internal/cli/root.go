@@ -47,7 +47,21 @@ func NewConfigCommand() *cobra.Command {
 	configCmd := &cobra.Command{
 		Use:   "config",
 		Short: "設定管理",
-		Long:  "Webhook URLなどの設定を管理します。",
+		Long: `Webhook URLなどの設定を管理します。
+
+利用可能な設定項目:
+  webhook_url    Discord Webhook URL
+                 形式: https://discord.com/api/webhooks/{id}/{token}
+                 用途: メッセージ送信先のDiscord Webhook URL
+
+設定ファイル:
+  デフォルト: ~/.discord-webhook/config.json
+  カスタム: --config フラグで指定可能
+
+使用例:
+  discord-webhook config set webhook_url https://discord.com/api/webhooks/...
+  discord-webhook config get webhook_url
+  discord-webhook config get`,
 	}
 
 	configCmd.AddCommand(NewConfigSetCommand())
