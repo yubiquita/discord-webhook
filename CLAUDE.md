@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 これはGoで構築されたDiscord Webhook CLIツールで、webhook URLを介してDiscordチャンネルにメッセージを送信できます。このツールはwebhook URLの設定管理機能を提供し、一回限りのURL指定、永続的な設定保存、標準入力からのパイプ入力の全てをサポートしています。
 
-**重要なモジュール情報**: `github.com/yubiquita/discord-webhook` - go installでの公開リポジトリ
+**重要なモジュール情報**: `github.com/yubiquita/discord-webhook` - go installでの公開リポジトリ（v0.1.0でリリース済み）
 
 ## アーキテクチャ
 
@@ -76,6 +76,20 @@ go mod verify
 
 # 脆弱性チェック
 go list -json -m all | nancy sleuth
+```
+
+### リリース・タグ管理
+```bash
+# 新しいバージョンタグを作成（semver形式）
+git tag v0.2.0
+git push origin v0.2.0
+
+# タグ一覧を確認
+git tag -l
+
+# 公開されたバージョンからインストール
+go install github.com/yubiquita/discord-webhook/cmd/discord-webhook@latest
+go install github.com/yubiquita/discord-webhook/cmd/discord-webhook@v0.1.0
 ```
 
 ## テストアーキテクチャ
