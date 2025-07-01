@@ -31,16 +31,14 @@ func NewSendCommand() *cobra.Command {
 		Short: "Discord Webhookにメッセージを送信",
 		Long:  "指定されたメッセージをDiscord Webhookに送信します。",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runSend(configPath, message, webhookURL, dryRun)
+			return runSend(cmd, configPath, message, webhookURL, dryRun)
 		},
 	}
 
 	sendCmd.Flags().StringVarP(&configPath, "config", "c", "", "設定ファイルのパス")
-	sendCmd.Flags().StringVarP(&message, "message", "m", "", "送信するメッセージ")
+	sendCmd.Flags().StringVarP(&message, "message", "m", "", "送信するメッセージ（未指定の場合は標準入力から読み取り）")
 	sendCmd.Flags().StringVarP(&webhookURL, "url", "u", "", "Webhook URL（設定ファイルより優先されます）")
 	sendCmd.Flags().BoolVar(&dryRun, "dry-run", false, "実際に送信せずにテスト実行")
-
-	sendCmd.MarkFlagRequired("message")
 
 	return sendCmd
 }
@@ -98,8 +96,8 @@ func NewConfigGetCommand() *cobra.Command {
 	return getCmd
 }
 
-func runSend(configPath, message, webhookURL string, dryRun bool) error {
-	return RunSend(configPath, message, webhookURL, dryRun)
+func runSend(cmd *cobra.Command, configPath, message, webhookURL string, dryRun bool) error {
+	return RunSend(cmd, configPath, message, webhookURL, dryRun)
 }
 
 func runConfigSet(configPath, key, value string) error {

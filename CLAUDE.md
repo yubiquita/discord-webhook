@@ -1,10 +1,12 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 このファイルは、このリポジトリでコードを扱う際のClaude Code (claude.ai/code) 向けガイダンスを提供します。
 
 ## プロジェクト概要
 
-これはGoで構築されたDiscord Webhook CLIツールで、webhook URLを介してDiscordチャンネルにメッセージを送信できます。このツールはwebhook URLの設定管理機能を提供し、一回限りのURL指定と永続的な設定保存の両方をサポートしています。
+これはGoで構築されたDiscord Webhook CLIツールで、webhook URLを介してDiscordチャンネルにメッセージを送信できます。このツールはwebhook URLの設定管理機能を提供し、一回限りのURL指定、永続的な設定保存、標準入力からのパイプ入力の全てをサポートしています。
 
 ## アーキテクチャ
 
@@ -18,6 +20,10 @@
 - **`internal/config/`**: JSON永続化による設定ファイル管理
 
 CLI層は`commands.go`のビジネスロジック関数に委譲し、configとwebhookパッケージ間を調整します。設定はデフォルトで`~/.discord-webhook/config.json`にJSONとして保存されます。
+
+**重要な設計パターン**:
+- `RunSend`関数は`cobra.Command`を受け取り、`cmd.InOrStdin()`と`cmd.OutOrStdout()`を使用してテスト可能な入出力を実現
+- 標準入力からのメッセージ読み取りは`--message`フラグが未指定の場合のみ実行され、フラグが優先される
 
 ## 開発コマンド
 
@@ -38,6 +44,9 @@ go test ./internal/cli/
 
 # 詳細出力でテストを実行
 go test -v ./...
+
+# 特定のテストケースのみ実行
+go test ./internal/cli/ -run "TestSendCommand_標準入力からメッセージを読み取る"
 ```
 
 ### 依存関係
@@ -67,4 +76,26 @@ Cobraフレームワークを使用して以下の階層でコマンドが構築
     - `set <key> <value>` - 設定値を設定
     - `get [key]` - 設定値を取得
 
-`send`コマンドはインラインURL指定（`-u/--url`）と永続的な設定ファイル使用の両方をサポートしています。`--dry-run`フラグは実際のメッセージ送信なしでテストを可能にします。
+`send`コマンドは複数の入力方法をサポートしています：
+- インラインURL指定（`-u/--url`）
+- 永続的な設定ファイル使用
+- `--message`フラグによる直接指定
+- 標準入力からのパイプ入力（`--message`未指定時）
+
+`--dry-run`フラグは実際のメッセージ送信なしでテストを可能にします。
+
+## 使用例
+
+```bash
+# フラグでメッセージを指定
+discord-webhook send --message "Hello" --url https://discord.com/api/webhooks/...
+
+# 標準入力からメッセージを受け取り
+echo "Hello Discord!" | discord-webhook send --url https://discord.com/api/webhooks/...
+
+# ファイルからメッセージを送信
+cat message.txt | discord-webhook send
+
+# 設定ファイルを使用してドライラン
+echo "Test message" | discord-webhook send --dry-run
+```

@@ -1,15 +1,31 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
+	"strings"
 
 	"discord-webhook/internal/config"
 	"discord-webhook/internal/webhook"
+	"github.com/spf13/cobra"
 )
 
-func RunSend(configPath, message, webhookURL string, dryRun bool) error {
+func RunSend(cmd *cobra.Command, configPath, message, webhookURL string, dryRun bool) error {
 	if message == "" {
-		return fmt.Errorf("メッセージが指定されていません")
+		scanner := bufio.NewScanner(cmd.InOrStdin())
+		var lines []string
+		for scanner.Scan() {
+			lines = append(lines, scanner.Text())
+		}
+		if err := scanner.Err(); err != nil {
+			return fmt.Errorf("標準入力の読み取りに失敗しました: %w", err)
+		}
+		
+		if len(lines) == 0 {
+			return fmt.Errorf("メッセージが指定されていません")
+		}
+		
+		message = strings.Join(lines, "\n")
 	}
 
 	finalWebhookURL := webhookURL
@@ -31,7 +47,7 @@ func RunSend(configPath, message, webhookURL string, dryRun bool) error {
 	}
 
 	if dryRun {
-		fmt.Printf("Dry run: メッセージ「%s」をURL「%s」に送信する予定です\n", message, finalWebhookURL)
+		fmt.Fprintf(cmd.OutOrStdout(), "Dry run: メッセージ「%s」をURL「%s」に送信する予定です\n", message, finalWebhookURL)
 		return nil
 	}
 
@@ -41,7 +57,7 @@ func RunSend(configPath, message, webhookURL string, dryRun bool) error {
 		return fmt.Errorf("メッセージの送信に失敗しました: %w", err)
 	}
 
-	fmt.Println("メッセージを正常に送信しました")
+	fmt.Fprintln(cmd.OutOrStdout(), "メッセージを正常に送信しました")
 	return nil
 }
 
