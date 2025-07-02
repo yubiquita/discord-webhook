@@ -6,54 +6,54 @@ import (
 	"testing"
 )
 
-func TestClient_SendMessage_正常なレスポンスを返す(t *testing.T) {
+func TestClient_SendMessage_ReturnsSuccessResponse(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			t.Errorf("期待されるメソッド: POST, 実際: %s", r.Method)
+			t.Errorf("expected method: POST, actual: %s", r.Method)
 		}
 		if r.Header.Get("Content-Type") != "application/json" {
-			t.Errorf("期待されるContent-Type: application/json, 実際: %s", r.Header.Get("Content-Type"))
+			t.Errorf("expected Content-Type: application/json, actual: %s", r.Header.Get("Content-Type"))
 		}
 		w.WriteHeader(http.StatusNoContent)
 	}))
 	defer server.Close()
 
 	client := NewClient()
-	err := client.SendMessage(server.URL, "テストメッセージ")
+	err := client.SendMessage(server.URL, "test message")
 
 	if err != nil {
-		t.Errorf("エラーが発生しました: %v", err)
+		t.Errorf("error occurred: %v", err)
 	}
 }
 
-func TestClient_SendMessage_不正なURLでエラーを返す(t *testing.T) {
+func TestClient_SendMessage_ReturnsErrorForInvalidURL(t *testing.T) {
 	client := NewClient()
-	err := client.SendMessage("invalid-url", "テストメッセージ")
+	err := client.SendMessage("invalid-url", "test message")
 
 	if err == nil {
-		t.Error("不正なURLに対してエラーが返されませんでした")
+		t.Error("no error returned for invalid URL")
 	}
 }
 
-func TestClient_SendMessage_空のメッセージでエラーを返す(t *testing.T) {
+func TestClient_SendMessage_ReturnsErrorForEmptyMessage(t *testing.T) {
 	client := NewClient()
 	err := client.SendMessage("https://discord.com/api/webhooks/test", "")
 
 	if err == nil {
-		t.Error("空のメッセージに対してエラーが返されませんでした")
+		t.Error("no error returned for empty message")
 	}
 }
 
-func TestClient_SendMessage_サーバーエラーを適切に処理する(t *testing.T) {
+func TestClient_SendMessage_HandlesServerErrorProperly(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer server.Close()
 
 	client := NewClient()
-	err := client.SendMessage(server.URL, "テストメッセージ")
+	err := client.SendMessage(server.URL, "test message")
 
 	if err == nil {
-		t.Error("サーバーエラーに対してエラーが返されませんでした")
+		t.Error("no error returned for server error")
 	}
 }

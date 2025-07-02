@@ -20,12 +20,12 @@ func Load(configPath string) (*Config, error) {
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
+		return nil, fmt.Errorf("failed to read configuration file: %w", err)
 	}
 
 	err = json.Unmarshal(data, config)
 	if err != nil {
-		return nil, fmt.Errorf("設定ファイルのパースに失敗しました: %w", err)
+		return nil, fmt.Errorf("failed to parse configuration file: %w", err)
 	}
 
 	return config, nil
@@ -34,17 +34,17 @@ func Load(configPath string) (*Config, error) {
 func (c *Config) Save(configPath string) error {
 	configDir := filepath.Dir(configPath)
 	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return fmt.Errorf("設定ディレクトリの作成に失敗しました: %w", err)
+		return fmt.Errorf("failed to create configuration directory: %w", err)
 	}
 
 	data, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
-		return fmt.Errorf("設定のJSON変換に失敗しました: %w", err)
+		return fmt.Errorf("failed to marshal configuration to JSON: %w", err)
 	}
 
 	err = os.WriteFile(configPath, data, 0644)
 	if err != nil {
-		return fmt.Errorf("設定ファイルの保存に失敗しました: %w", err)
+		return fmt.Errorf("failed to save configuration file: %w", err)
 	}
 
 	return nil

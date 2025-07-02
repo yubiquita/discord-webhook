@@ -27,7 +27,7 @@ func NewClient() *Client {
 
 func (c *Client) SendMessage(webhookURL, content string) error {
 	if strings.TrimSpace(content) == "" {
-		return fmt.Errorf("メッセージが空です")
+		return fmt.Errorf("message is empty")
 	}
 
 	message := DiscordMessage{
@@ -36,24 +36,24 @@ func (c *Client) SendMessage(webhookURL, content string) error {
 
 	jsonData, err := json.Marshal(message)
 	if err != nil {
-		return fmt.Errorf("JSONエンコードに失敗しました: %w", err)
+		return fmt.Errorf("failed to encode JSON: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPost, webhookURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("HTTPリクエストの作成に失敗しました: %w", err)
+		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("HTTPリクエストの送信に失敗しました: %w", err)
+		return fmt.Errorf("failed to send HTTP request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("Discord API エラー: ステータスコード %d", resp.StatusCode)
+		return fmt.Errorf("Discord API error: status code %d", resp.StatusCode)
 	}
 
 	return nil

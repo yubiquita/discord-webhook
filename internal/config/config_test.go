@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestConfig_保存と読み込みが正常に動作する(t *testing.T) {
+func TestConfig_SaveAndLoadWorksCorrectly(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.json")
 
@@ -16,55 +16,55 @@ func TestConfig_保存と読み込みが正常に動作する(t *testing.T) {
 
 	err := config.Save(configPath)
 	if err != nil {
-		t.Fatalf("設定の保存に失敗しました: %v", err)
+		t.Fatalf("failed to save configuration: %v", err)
 	}
 
 	loadedConfig, err := Load(configPath)
 	if err != nil {
-		t.Fatalf("設定の読み込みに失敗しました: %v", err)
+		t.Fatalf("failed to load configuration: %v", err)
 	}
 
 	if loadedConfig.WebhookURL != config.WebhookURL {
-		t.Errorf("期待されるWebhook URL: %s, 実際: %s", config.WebhookURL, loadedConfig.WebhookURL)
+		t.Errorf("expected Webhook URL: %s, actual: %s", config.WebhookURL, loadedConfig.WebhookURL)
 	}
 }
 
-func TestConfig_存在しないファイルからの読み込みでデフォルト設定を返す(t *testing.T) {
+func TestConfig_LoadFromNonExistentFileReturnsDefaultConfig(t *testing.T) {
 	nonExistentPath := "/tmp/nonexistent_config.json"
 
 	config, err := Load(nonExistentPath)
 	if err != nil {
-		t.Fatalf("存在しないファイルからの読み込みでエラーが発生しました: %v", err)
+		t.Fatalf("error occurred when loading from non-existent file: %v", err)
 	}
 
 	if config.WebhookURL != "" {
-		t.Errorf("デフォルト設定でWebhook URLが空文字列でありません: %s", config.WebhookURL)
+		t.Errorf("default configuration Webhook URL is not empty string: %s", config.WebhookURL)
 	}
 }
 
-func TestConfig_不正なJSONファイルからの読み込みでエラーを返す(t *testing.T) {
+func TestConfig_LoadFromInvalidJSONFileReturnsError(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "invalid_config.json")
 
 	err := os.WriteFile(configPath, []byte("invalid json"), 0644)
 	if err != nil {
-		t.Fatalf("テスト用不正JSONファイルの作成に失敗しました: %v", err)
+		t.Fatalf("failed to create test invalid JSON file: %v", err)
 	}
 
 	_, err = Load(configPath)
 	if err == nil {
-		t.Error("不正なJSONファイルに対してエラーが返されませんでした")
+		t.Error("no error returned for invalid JSON file")
 	}
 }
 
-func TestConfig_デフォルト設定パスが正しく取得される(t *testing.T) {
+func TestConfig_DefaultConfigPathIsRetrievedCorrectly(t *testing.T) {
 	path := GetDefaultConfigPath()
 
 	if path == "" {
-		t.Error("デフォルト設定パスが空文字列です")
+		t.Error("default configuration path is empty string")
 	}
 
 	if !filepath.IsAbs(path) {
-		t.Error("デフォルト設定パスが絶対パスではありません")
+		t.Error("default configuration path is not absolute path")
 	}
 }

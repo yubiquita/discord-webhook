@@ -7,9 +7,9 @@ import (
 func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "discord-webhook",
-		Short: "Discord Webhook経由でメッセージを送信するCLIツール",
-		Long: `Discord Webhook経由でメッセージを送信するシンプルなCLIツールです。
-設定ファイルでWebhook URLを管理し、コマンドラインからメッセージを送信できます。`,
+		Short: "CLI tool for sending messages via Discord Webhook",
+		Long: `A simple CLI tool for sending messages via Discord Webhook.
+Manage Webhook URLs in configuration files and send messages from the command line.`,
 	}
 
 	rootCmd.AddCommand(NewSendCommand())
@@ -28,17 +28,17 @@ func NewSendCommand() *cobra.Command {
 
 	sendCmd := &cobra.Command{
 		Use:   "send",
-		Short: "Discord Webhookにメッセージを送信",
-		Long:  "指定されたメッセージをDiscord Webhookに送信します。",
+		Short: "Send message to Discord Webhook",
+		Long:  "Send the specified message to Discord Webhook.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSend(cmd, configPath, message, webhookURL, dryRun)
 		},
 	}
 
-	sendCmd.Flags().StringVarP(&configPath, "config", "c", "", "設定ファイルのパス")
-	sendCmd.Flags().StringVarP(&message, "message", "m", "", "送信するメッセージ（未指定の場合は標準入力から読み取り）")
-	sendCmd.Flags().StringVarP(&webhookURL, "url", "u", "", "Webhook URL（設定ファイルより優先されます）")
-	sendCmd.Flags().BoolVar(&dryRun, "dry-run", false, "実際に送信せずにテスト実行")
+	sendCmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
+	sendCmd.Flags().StringVarP(&message, "message", "m", "", "Message to send (reads from stdin if not specified)")
+	sendCmd.Flags().StringVarP(&webhookURL, "url", "u", "", "Webhook URL (takes priority over configuration file)")
+	sendCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Test execution without actually sending")
 
 	return sendCmd
 }
@@ -46,19 +46,19 @@ func NewSendCommand() *cobra.Command {
 func NewConfigCommand() *cobra.Command {
 	configCmd := &cobra.Command{
 		Use:   "config",
-		Short: "設定管理",
-		Long: `Webhook URLなどの設定を管理します。
+		Short: "Configuration management",
+		Long: `Manage configurations such as webhook URLs.
 
-利用可能な設定項目:
+Available configuration keys:
   webhook_url    Discord Webhook URL
-                 形式: https://discord.com/api/webhooks/{id}/{token}
-                 用途: メッセージ送信先のDiscord Webhook URL
+                 Format: https://discord.com/api/webhooks/{id}/{token}
+                 Usage: Discord Webhook URL for message destination
 
-設定ファイル:
-  デフォルト: ~/.discord-webhook/config.json
-  カスタム: --config フラグで指定可能
+Configuration file:
+  Default: ~/.discord-webhook/config.json
+  Custom: Can be specified with --config flag
 
-使用例:
+Usage examples:
   discord-webhook config set webhook_url https://discord.com/api/webhooks/...
   discord-webhook config get webhook_url
   discord-webhook config get`,
@@ -75,15 +75,15 @@ func NewConfigSetCommand() *cobra.Command {
 
 	setCmd := &cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "設定値を設定",
-		Long:  "設定値を設定します。現在はwebhook_urlのみサポートしています。",
+		Short: "Set configuration value",
+		Long:  "Set configuration value. Currently only webhook_url is supported.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runConfigSet(configPath, args[0], args[1])
 		},
 	}
 
-	setCmd.Flags().StringVarP(&configPath, "config", "c", "", "設定ファイルのパス")
+	setCmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 
 	return setCmd
 }
@@ -93,8 +93,8 @@ func NewConfigGetCommand() *cobra.Command {
 
 	getCmd := &cobra.Command{
 		Use:   "get [key]",
-		Short: "設定値を取得",
-		Long:  "設定値を表示します。keyを指定しない場合はすべての設定を表示します。",
+		Short: "Get configuration value",
+		Long:  "Display configuration values. Shows all configurations if key is not specified.",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key := ""
@@ -105,7 +105,7 @@ func NewConfigGetCommand() *cobra.Command {
 		},
 	}
 
-	getCmd.Flags().StringVarP(&configPath, "config", "c", "", "設定ファイルのパス")
+	getCmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to configuration file")
 
 	return getCmd
 }

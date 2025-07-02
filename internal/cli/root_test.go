@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestRootCommand_正常にヘルプメッセージを表示する(t *testing.T) {
+func TestRootCommand_DisplaysHelpMessageCorrectly(t *testing.T) {
 	output := &bytes.Buffer{}
 	cmd := NewRootCommand()
 	cmd.SetOut(output)
@@ -17,26 +17,26 @@ func TestRootCommand_正常にヘルプメッセージを表示する(t *testing
 
 	err := cmd.Execute()
 	if err != nil {
-		t.Fatalf("ヘルプコマンドの実行に失敗しました: %v", err)
+		t.Fatalf("failed to execute help command: %v", err)
 	}
 
 	result := output.String()
 	if result == "" {
-		t.Error("ヘルプメッセージが空です")
+		t.Error("help message is empty")
 	}
 }
 
-func TestSendCommand_正常なメッセージ送信をモックする(t *testing.T) {
+func TestSendCommand_MocksNormalMessageSending(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.json")
 
 	testWebhookURL := "https://discord.com/api/webhooks/test/token"
-	testMessage := "テストメッセージ"
+	testMessage := "test message"
 
 	config := fmt.Sprintf(`{"webhook_url": "%s"}`, testWebhookURL)
 	err := os.WriteFile(configPath, []byte(config), 0644)
 	if err != nil {
-		t.Fatalf("テスト用設定ファイルの作成に失敗しました: %v", err)
+		t.Fatalf("failed to create test configuration file: %v", err)
 	}
 
 	output := &bytes.Buffer{}
@@ -46,11 +46,11 @@ func TestSendCommand_正常なメッセージ送信をモックする(t *testing
 
 	err = cmd.Execute()
 	if err != nil {
-		t.Fatalf("sendコマンドの実行に失敗しました: %v", err)
+		t.Fatalf("failed to execute send command: %v", err)
 	}
 }
 
-func TestSendCommand_メッセージが指定されていない場合にエラーを返す(t *testing.T) {
+func TestSendCommand_ReturnsErrorWhenMessageNotSpecified(t *testing.T) {
 	output := &bytes.Buffer{}
 	cmd := NewRootCommand()
 	cmd.SetOut(output)
@@ -59,11 +59,11 @@ func TestSendCommand_メッセージが指定されていない場合にエラ�
 
 	err := cmd.Execute()
 	if err == nil {
-		t.Error("メッセージが指定されていない場合にエラーが返されませんでした")
+		t.Error("no error returned when message is not specified")
 	}
 }
 
-func TestConfigCommand_webhook_url設定が正常に動作する(t *testing.T) {
+func TestConfigCommand_WebhookURLConfigurationWorksCorrectly(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.json")
 
@@ -76,25 +76,25 @@ func TestConfigCommand_webhook_url設定が正常に動作する(t *testing.T) {
 
 	err := cmd.Execute()
 	if err != nil {
-		t.Fatalf("config setコマンドの実行に失敗しました: %v", err)
+		t.Fatalf("failed to execute config set command: %v", err)
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		t.Error("設定ファイルが作成されませんでした")
+		t.Error("configuration file was not created")
 	}
 }
 
-func TestSendCommand_標準入力からメッセージを読み取る(t *testing.T) {
+func TestSendCommand_ReadsMessageFromStdin(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.json")
 
 	testWebhookURL := "https://discord.com/api/webhooks/test/token"
-	testMessage := "標準入力からのテストメッセージ"
+	testMessage := "test message from stdin"
 
 	config := fmt.Sprintf(`{"webhook_url": "%s"}`, testWebhookURL)
 	err := os.WriteFile(configPath, []byte(config), 0644)
 	if err != nil {
-		t.Fatalf("テスト用設定ファイルの作成に失敗しました: %v", err)
+		t.Fatalf("failed to create test configuration file: %v", err)
 	}
 
 	output := &bytes.Buffer{}
@@ -106,27 +106,27 @@ func TestSendCommand_標準入力からメッセージを読み取る(t *testing
 
 	err = cmd.Execute()
 	if err != nil {
-		t.Fatalf("標準入力を使ったsendコマンドの実行に失敗しました: %v", err)
+		t.Fatalf("failed to execute send command with stdin: %v", err)
 	}
 
 	outputStr := output.String()
 	if !strings.Contains(outputStr, testMessage) {
-		t.Errorf("出力に標準入力からのメッセージが含まれていません。出力: '%s'", outputStr)
+		t.Errorf("output does not contain message from stdin. Output: '%s'", outputStr)
 	}
 }
 
-func TestSendCommand_フラグのメッセージが標準入力より優先される(t *testing.T) {
+func TestSendCommand_FlagMessageTakesPriorityOverStdin(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.json")
 
 	testWebhookURL := "https://discord.com/api/webhooks/test/token"
-	flagMessage := "フラグのメッセージ"
-	stdinMessage := "標準入力のメッセージ"
+	flagMessage := "flag message"
+	stdinMessage := "stdin message"
 
 	config := fmt.Sprintf(`{"webhook_url": "%s"}`, testWebhookURL)
 	err := os.WriteFile(configPath, []byte(config), 0644)
 	if err != nil {
-		t.Fatalf("テスト用設定ファイルの作成に失敗しました: %v", err)
+		t.Fatalf("failed to create test configuration file: %v", err)
 	}
 
 	output := &bytes.Buffer{}
@@ -138,19 +138,19 @@ func TestSendCommand_フラグのメッセージが標準入力より優先さ�
 
 	err = cmd.Execute()
 	if err != nil {
-		t.Fatalf("フラグメッセージ優先のsendコマンドの実行に失敗しました: %v", err)
+		t.Fatalf("failed to execute send command with flag message priority: %v", err)
 	}
 
 	outputStr := output.String()
 	if !strings.Contains(outputStr, flagMessage) {
-		t.Errorf("出力にフラグのメッセージが含まれていません。出力: '%s'", outputStr)
+		t.Errorf("output does not contain flag message. Output: '%s'", outputStr)
 	}
 	if strings.Contains(outputStr, stdinMessage) {
-		t.Errorf("フラグが指定されているのに標準入力のメッセージが使用されました。出力: '%s'", outputStr)
+		t.Errorf("stdin message was used despite flag being specified. Output: '%s'", outputStr)
 	}
 }
 
-func TestSendCommand_標準入力が空の場合にエラーを返す(t *testing.T) {
+func TestSendCommand_ReturnsErrorWhenStdinIsEmpty(t *testing.T) {
 	output := &bytes.Buffer{}
 	cmd := NewRootCommand()
 	cmd.SetOut(output)
@@ -160,6 +160,6 @@ func TestSendCommand_標準入力が空の場合にエラーを返す(t *testing
 
 	err := cmd.Execute()
 	if err == nil {
-		t.Error("標準入力が空の場合にエラーが返されませんでした")
+		t.Error("no error returned when stdin is empty")
 	}
 }

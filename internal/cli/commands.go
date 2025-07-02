@@ -18,11 +18,11 @@ func RunSend(cmd *cobra.Command, configPath, message, webhookURL string, dryRun 
 			lines = append(lines, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-			return fmt.Errorf("標準入力の読み取りに失敗しました: %w", err)
+			return fmt.Errorf("failed to read from stdin: %w", err)
 		}
 		
 		if len(lines) == 0 {
-			return fmt.Errorf("メッセージが指定されていません")
+			return fmt.Errorf("no message specified")
 		}
 		
 		message = strings.Join(lines, "\n")
@@ -36,34 +36,34 @@ func RunSend(cmd *cobra.Command, configPath, message, webhookURL string, dryRun 
 
 		cfg, err := config.Load(configPath)
 		if err != nil {
-			return fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
+			return fmt.Errorf("failed to load configuration file: %w", err)
 		}
 
 		if cfg.WebhookURL == "" {
-			return fmt.Errorf("Webhook URLが設定されていません。--urlフラグで指定するか、設定ファイルに保存してください")
+			return fmt.Errorf("no webhook URL configured. Please specify with --url flag or save in configuration file")
 		}
 
 		finalWebhookURL = cfg.WebhookURL
 	}
 
 	if dryRun {
-		fmt.Fprintf(cmd.OutOrStdout(), "Dry run: メッセージ「%s」をURL「%s」に送信する予定です\n", message, finalWebhookURL)
+		fmt.Fprintf(cmd.OutOrStdout(), "Dry run: would send message '%s' to URL '%s'\n", message, finalWebhookURL)
 		return nil
 	}
 
 	client := webhook.NewClient()
 	err := client.SendMessage(finalWebhookURL, message)
 	if err != nil {
-		return fmt.Errorf("メッセージの送信に失敗しました: %w", err)
+		return fmt.Errorf("failed to send message: %w", err)
 	}
 
-	fmt.Fprintln(cmd.OutOrStdout(), "メッセージを正常に送信しました")
+	fmt.Fprintln(cmd.OutOrStdout(), "Message sent successfully")
 	return nil
 }
 
 func RunConfigSet(configPath, key, value string) error {
 	if key != "webhook_url" {
-		return fmt.Errorf("サポートされていない設定キー: %s", key)
+		return fmt.Errorf("unsupported configuration key: %s", key)
 	}
 
 	if configPath == "" {
@@ -72,7 +72,7 @@ func RunConfigSet(configPath, key, value string) error {
 
 	cfg, err := config.Load(configPath)
 	if err != nil {
-		return fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
+		return fmt.Errorf("failed to load configuration file: %w", err)
 	}
 
 	switch key {
@@ -82,10 +82,10 @@ func RunConfigSet(configPath, key, value string) error {
 
 	err = cfg.Save(configPath)
 	if err != nil {
-		return fmt.Errorf("設定ファイルの保存に失敗しました: %w", err)
+		return fmt.Errorf("failed to save configuration file: %w", err)
 	}
 
-	fmt.Printf("設定「%s」を「%s」に設定しました\n", key, value)
+	fmt.Printf("Configuration '%s' set to '%s'\n", key, value)
 	return nil
 }
 
@@ -96,7 +96,7 @@ func RunConfigGet(configPath, key string) error {
 
 	cfg, err := config.Load(configPath)
 	if err != nil {
-		return fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
+		return fmt.Errorf("failed to load configuration file: %w", err)
 	}
 
 	if key == "" {
@@ -108,7 +108,7 @@ func RunConfigGet(configPath, key string) error {
 	case "webhook_url":
 		fmt.Println(cfg.WebhookURL)
 	default:
-		return fmt.Errorf("サポートされていない設定キー: %s", key)
+		return fmt.Errorf("unsupported configuration key: %s", key)
 	}
 
 	return nil

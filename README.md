@@ -1,24 +1,24 @@
 # Discord Webhook CLI
 
-Discord Webhook URLを使用してDiscordチャンネルにメッセージを送信するためのシンプルで強力なコマンドラインツールです。
+A simple and powerful command-line tool for sending messages to Discord channels using Discord Webhook URLs.
 
-## 特徴
+## Features
 
-- **複数の入力方法**: フラグ、標準入力、またはパイプからメッセージを受け取り
-- **設定管理**: Webhook URLを永続的に保存して再利用
-- **ドライラン**: 実際にメッセージを送信せずにテスト
-- **クリーンな出力**: 人間が読みやすい形式でレスポンスを表示
-- **Claude Code連携**: notification hookとして使用可能
+- **Multiple input methods**: Accept messages from flags, stdin, or pipes
+- **Configuration management**: Persistently save and reuse webhook URLs
+- **Dry run**: Test without actually sending messages
+- **Clean output**: Display responses in human-readable format
+- **Claude Code integration**: Can be used as a notification hook
 
-## インストール
+## Installation
 
-### go installでインストール（推奨）
+### Install via go install (recommended)
 
 ```bash
 go install github.com/yubiquita/discord-webhook/cmd/discord-webhook@latest
 ```
 
-### ソースからビルド
+### Build from source
 
 ```bash
 git clone https://github.com/yubiquita/discord-webhook.git
@@ -26,81 +26,81 @@ cd discord-webhook
 go build -o discord-webhook ./cmd/discord-webhook/
 ```
 
-ビルドされたバイナリを任意の場所に配置してください（例：`/usr/local/bin/`）。
+Place the built binary in your desired location (e.g., `/usr/local/bin/`).
 
-## 必要要件
+## Requirements
 
-- Go 1.24.4以上
+- Go 1.24.4 or higher
 
-## 使用方法
+## Usage
 
-### 基本的な使用例
+### Basic usage examples
 
-#### 1. フラグでメッセージを指定
+#### 1. Specify message with flag
 
 ```bash
 discord-webhook send --message "Hello Discord!" --url https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
 ```
 
-#### 2. 標準入力からメッセージを読み取り
+#### 2. Read message from stdin
 
 ```bash
 echo "Hello from command line!" | discord-webhook send --url https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
 ```
 
-#### 3. ファイルからメッセージを送信
+#### 3. Send message from file
 
 ```bash
 cat message.txt | discord-webhook send --url https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
 ```
 
-### 設定管理
+### Configuration management
 
-Webhook URLを永続的に保存して、毎回指定する必要をなくすことができます。
+You can persistently save webhook URLs to avoid specifying them every time.
 
-#### Webhook URLを設定
+#### Set webhook URL
 
 ```bash
 discord-webhook config set webhook_url https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
 ```
 
-#### 設定されたURLを使用してメッセージを送信
+#### Send message using configured URL
 
 ```bash
-discord-webhook send --message "設定されたURLを使用"
+discord-webhook send --message "Using configured URL"
 ```
 
-または
+or
 
 ```bash
-echo "パイプからのメッセージ" | discord-webhook send
+echo "Message from pipe" | discord-webhook send
 ```
 
-#### 設定値を確認
+#### Check configuration values
 
 ```bash
-# 全ての設定を表示
+# Display all configurations
 discord-webhook config get
 
-# 特定の設定を表示
+# Display specific configuration
 discord-webhook config get webhook_url
 ```
 
-### ドライラン
+### Dry run
 
-実際にメッセージを送信せずにテストできます：
+You can test without actually sending messages:
 
 ```bash
-echo "テストメッセージ" | discord-webhook send --dry-run
+echo "Test message" | discord-webhook send --dry-run
 ```
 
-### Claude Code notification hookとの連携
+### Integration with Claude Code notification hooks
 
-Claude Codeのnotification hook機能と組み合わせることで、様々なイベント（ファイル変更、コマンド実行など）をDiscordに通知できます。
+You can combine this tool with Claude Code's notification hook feature to send various events (file changes, command executions, etc.) to Discord.
 
-#### 設定例
+#### Configuration example
 
-Claude Codeの設定ファイル（`~/.claude/settings.json`）でnotification hookを設定：
+Set up notification hooks in Claude Code's configuration file (`~/.claude/settings.json`):
 
 ```json
 {
@@ -120,36 +120,36 @@ Claude Codeの設定ファイル（`~/.claude/settings.json`）でnotification h
 }
 ```
 
-この設定により、Claude CodeからのJSON形式の通知メッセージを自動的にDiscordに転送できます。
+This configuration automatically forwards JSON-formatted notification messages from Claude Code to Discord.
 
-## コマンドリファレンス
+## Command reference
 
 ### `discord-webhook send`
 
-Discordチャンネルにメッセージを送信します。
+Send a message to a Discord channel.
 
-**フラグ:**
-- `-m, --message string`: 送信するメッセージ（指定されない場合は標準入力から読み取り）
-- `-u, --url string`: Discord Webhook URL（設定ファイルよりも優先）
-- `--dry-run`: 実際のメッセージ送信なしでテスト
+**Flags:**
+- `-m, --message string`: Message to send (reads from stdin if not specified)
+- `-u, --url string`: Discord Webhook URL (takes priority over configuration file)
+- `--dry-run`: Test without actually sending the message
 
 ### `discord-webhook config`
 
-設定を管理します。
+Manage configurations.
 
-**サブコマンド:**
-- `set <key> <value>`: 設定値を設定
-- `get [key]`: 設定値を取得（keyが未指定の場合は全設定を表示）
+**Subcommands:**
+- `set <key> <value>`: Set configuration value
+- `get [key]`: Get configuration value (displays all configurations if key is not specified)
 
-**設定可能なキー:**
+**Configurable keys:**
 - `webhook_url`: Discord Webhook URL
 
-## 設定ファイル
+## Configuration file
 
-設定は以下の場所に保存されます：
+Configurations are saved at:
 - `~/.discord-webhook/config.json`
 
-ファイルはJSON形式で、以下のような構造です：
+The file is in JSON format with the following structure:
 
 ```json
 {
@@ -157,49 +157,49 @@ Discordチャンネルにメッセージを送信します。
 }
 ```
 
-## Discord Webhook URLの取得方法
+## How to get Discord Webhook URL
 
-1. Discordでメッセージを送信したいチャンネルを選択
-2. チャンネル設定（歯車アイコン）を開く
-3. 「連携サービス」→「ウェブフック」を選択
-4. 「新しいウェブフック」を作成
-5. 生成されたWebhook URLをコピー
+1. Select the Discord channel where you want to send messages
+2. Open channel settings (gear icon)
+3. Go to "Integrations" → "Webhooks"
+4. Create a "New Webhook"
+5. Copy the generated Webhook URL
 
-## トラブルシューティング
+## Troubleshooting
 
-### エラー: "No webhook URL provided"
+### Error: "No webhook URL provided"
 
-- `--url`フラグでURLを指定するか、`config set webhook_url`で設定してください
+- Specify a URL with the `--url` flag or set it with `config set webhook_url`
 
-### エラー: "Failed to send message"
+### Error: "Failed to send message"
 
-- Webhook URLが正しいか確認してください
-- インターネット接続を確認してください
-- Discord側でWebhookが有効か確認してください
+- Verify that the webhook URL is correct
+- Check your internet connection
+- Confirm that the webhook is enabled on Discord
 
-## 開発者向け情報
+## Developer information
 
-このプロジェクトはGoで開発されており、以下の主要な依存関係を使用しています：
+This project is developed in Go and uses the following main dependencies:
 
-- [Cobra](https://github.com/spf13/cobra): CLIフレームワーク
-- 標準ライブラリのみでHTTPクライアントを実装
+- [Cobra](https://github.com/spf13/cobra): CLI framework
+- HTTP client implemented with standard library only
 
-### テスト実行
+### Running tests
 
 ```bash
 go test ./...
 ```
 
-### プロジェクト構造
+### Project structure
 
 ```
 .
-├── cmd/discord-webhook/    # アプリケーションエントリーポイント
-├── internal/cli/          # CLIコマンド定義
-├── internal/webhook/      # Discord webhook API通信
-└── internal/config/       # 設定ファイル管理
+├── cmd/discord-webhook/    # Application entry point
+├── internal/cli/          # CLI command definitions
+├── internal/webhook/      # Discord webhook API communication
+└── internal/config/       # Configuration file management
 ```
 
-## ライセンス
+## License
 
-このプロジェクトはMIT Licenseの下で公開されています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
+This project is released under the MIT License. See the [LICENSE](LICENSE) file for details.
